@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: lafayettegabe/wald:latest
+    image: jstet/wald:latest
     container_name: postgres
     hostname: postgres
     ports:

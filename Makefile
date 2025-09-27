@@ -32,3 +32,4 @@ release: test-integration
 	uv build
 	git push --follow-tags
 	uv publish
+	gh release create $$(git describe --tags --abbrev=0) --generate-notes

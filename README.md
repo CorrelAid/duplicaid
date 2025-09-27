@@ -10,7 +10,7 @@ DuplicAid is a CLI tool for managing PostgreSQL backups via WAL-G (point-in-time
 
 The tool supports both local and remote execution modes, making it flexible for various deployment scenarios.
 
-⚠️ The package depends on the image `lafayettegabe/wald`, which is a PostgreSQL container with WAL-G support and `tiredofit/docker-db-backup:4.1.21` for logical backups.
+⚠️ The package depends on the image `jstet/wald`, which is a PostgreSQL container with WAL-G support and `tiredofit/docker-db-backup:4.1.21` for logical backups.
 
 ## Features
 
@@ -198,7 +198,7 @@ Local Machine          Remote Server
 
   duplicaid      SSH
     CLI                PostgreSQL Container
-                       (lafayettegabe/wald)
+                       (jstet/wald)
 
                           Backup Container
                         (tiredofit/db-backup)
@@ -211,7 +211,7 @@ Local Machine
   duplicaid CLI
        |
    PostgreSQL Container
-   (lafayettegabe/wald)
+   (jstet/wald)
        |
    Backup Container
  (tiredofit/db-backup)
@@ -236,7 +236,7 @@ Local Machine
 ### Common Requirements
 - Python 3.12+
 - Docker and Docker Compose
-- PostgreSQL with WAL-G (e.g., lafayettegabe/wald:latest)
+- PostgreSQL with WAL-G (e.g., jstet/wald:latest)
 - tiredofit/db-backup container for logical backups
 
 ### Remote Mode Additional Requirements

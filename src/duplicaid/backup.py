@@ -179,7 +179,7 @@ class WALGBackupManager:
                 f"--env-file {self.config.docker_compose_path.replace('docker-compose.yml', '.env')} "
                 f"--user postgres "
                 f"-v postgres_data:/var/lib/postgresql/data "
-                f"lafayettegabe/wald:latest "
+                f"jstet/wald:latest "
                 f"envdir /etc/wal-g/env /usr/local/bin/wal-g backup-fetch /var/lib/postgresql/data {backup_name}"
             )
 
@@ -196,7 +196,7 @@ class WALGBackupManager:
                 recovery_command = (
                     f"docker run --rm "
                     f"-v postgres_data:/var/lib/postgresql/data "
-                    f"lafayettegabe/wald:latest "
+                    f"jstet/wald:latest "
                     f'bash -c "'
                     f"touch /var/lib/postgresql/data/recovery.signal && "
                     f"cat >> /var/lib/postgresql/data/postgresql.auto.conf << 'EOF'\\n"
