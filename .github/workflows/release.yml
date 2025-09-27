@@ -79,12 +79,6 @@ jobs:
         if: steps.check.outputs.release == 'true'
         run: uv run cz bump --changelog --yes
 
-      - name: Push version tag
-        if: steps.check.outputs.release == 'true'
-        run: git push origin --follow-tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build package
         if: steps.check.outputs.release == 'true'
         run: uv build
