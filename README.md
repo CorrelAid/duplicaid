@@ -8,6 +8,8 @@
 
 DuplicAid is a CLI tool for managing PostgreSQL backups via WAL-G (point-in-time recovery) and logical dumps. It provides a unified interface for creating, listing, and restoring backups from PostgreSQL instances running in Docker containers.
 
+The tool supports both local and remote execution modes, making it flexible for various deployment scenarios.
+
 ⚠️ The package depends on the image `lafayettegabe/wald`, which is a PostgreSQL container with WAL-G support and `tiredofit/docker-db-backup:4.1.21` for logical backups.
 
 ## Features
