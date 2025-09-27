@@ -273,6 +273,47 @@ def list_logical():
         raise typer.Exit(1)
 
 
+@list_app.command("databases")
+def list_databases():
+    """List available databases in PostgreSQL."""
+    check_config()
+
+    try:
+        with get_executor() as executor:
+            postgres_running = executor.check_container_running(
+                config.postgres_container
+            )
+
+            if not postgres_running:
+                console.print("[red]PostgreSQL container is not running.[/red]")
+                raise typer.Exit(1)
+
+            discovery = DatabaseDiscovery(config)
+            databases = discovery.get_databases(executor)
+
+            if not databases:
+                console.print("[yellow]No databases found.[/yellow]")
+                return
+
+            table = Table(title="Available Databases", box=box.ROUNDED)
+            table.add_column("Database", style="cyan")
+            table.add_column("Size", style="green")
+            table.add_column("Owner", style="blue")
+
+            for db_info in databases:
+                table.add_row(
+                    db_info["name"],
+                    db_info.get("size", "Unknown"),
+                    db_info.get("owner", "Unknown"),
+                )
+
+            console.print(table)
+
+    except ExecutorError as e:
+        console.print(f"[red]Executor Error: {e}[/red]")
+        raise typer.Exit(1)
+
+
 # Status command
 @app.command("status")
 def status():
