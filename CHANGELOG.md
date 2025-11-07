@@ -1,3 +1,9 @@
+## v1.1.0 (2025-11-07)
+
+### Feat
+
+- add postgres user and password to config
+
 ## v1.0.0 (2025-11-07)
 
 ### Feat
