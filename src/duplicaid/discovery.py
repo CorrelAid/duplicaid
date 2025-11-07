@@ -42,7 +42,7 @@ class DatabaseDiscovery:
             ORDER BY datname;
             """
 
-            command = f'psql -U postgres -t -c "{query}"'
+            command = f'psql -U {self.config.postgres_user} -t -c "{query}"'
 
             stdout, stderr, exit_code = executor.docker_exec(
                 self.config.postgres_container, command
@@ -116,7 +116,7 @@ class DatabaseDiscovery:
             WHERE datname = '{database}';
             """
 
-            command = f'psql -U postgres -t -c "{query}"'
+            command = f'psql -U {self.config.postgres_user} -t -c "{query}"'
 
             stdout, stderr, exit_code = executor.docker_exec(
                 self.config.postgres_container, command

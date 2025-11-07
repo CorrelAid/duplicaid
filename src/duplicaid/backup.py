@@ -431,15 +431,13 @@ class LogicalBackupManager:
         try:
             # Determine restore command based on file extension
             if backup_file.endswith(".gz"):
-                restore_command = (
-                    f"gunzip -c {backup_file} | psql -U postgres -d {database}"
-                )
+                restore_command = f"gunzip -c {backup_file} | psql -U {self.config.postgres_user} -d {database}"
             elif backup_file.endswith(".bz2"):
-                restore_command = (
-                    f"bunzip2 -c {backup_file} | psql -U postgres -d {database}"
-                )
+                restore_command = f"bunzip2 -c {backup_file} | psql -U {self.config.postgres_user} -d {database}"
             else:
-                restore_command = f"psql -U postgres -d {database} < {backup_file}"
+                restore_command = (
+                    f"psql -U {self.config.postgres_user} -d {database} < {backup_file}"
+                )
 
             with Progress(
                 SpinnerColumn(),
@@ -470,7 +468,7 @@ class LogicalBackupManager:
                     for cmd in permission_commands:
                         executor.docker_exec(
                             self.config.postgres_container,
-                            f'psql -U postgres -c "{cmd}" {database}',
+                            f'psql -U {self.config.postgres_user} -c "{cmd}" {database}',
                         )
 
                     return True
