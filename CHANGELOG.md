@@ -1,3 +1,9 @@
+## v1.1.1 (2025-11-07)
+
+### Fix
+
+- use configured postgres user instead of hardcoded 'postgres'
+
 ## v1.1.0 (2025-11-07)
 
 ### Feat
