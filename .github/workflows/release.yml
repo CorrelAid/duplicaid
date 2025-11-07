@@ -21,9 +21,10 @@ jobs:
             docs-only:
               - '**/*.md'
               - 'docs/**'
+              - 'tests/**'
+              - 'docker-compose*.yml'
             code:
               - 'src/**'
-              - 'tests/**'
               - 'pyproject.toml'
               - '.github/workflows/**'
 
