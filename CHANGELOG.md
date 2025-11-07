@@ -1,3 +1,9 @@
+## v1.2.0 (2025-11-07)
+
+### Feat
+
+- add S3 support for listing logical backups using minio
+
 ## v1.1.1 (2025-11-07)
 
 ### Fix
