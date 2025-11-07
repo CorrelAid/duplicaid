@@ -88,6 +88,16 @@ class Config:
         """Get list of configured databases."""
         return self._data.get("databases", [])
 
+    @property
+    def postgres_user(self) -> str:
+        """Get PostgreSQL user."""
+        return self._data.get("postgres", {}).get("user", "postgres")
+
+    @property
+    def postgres_password(self) -> Optional[str]:
+        """Get PostgreSQL password."""
+        return self._data.get("postgres", {}).get("password")
+
     def init_config(self) -> None:
         """Initialize configuration interactively."""
         console.print("[bold blue]DuplicAid Configuration Setup[/bold blue]")
@@ -112,6 +122,10 @@ class Config:
         # Container configuration
         postgres_container = Prompt.ask("PostgreSQL container name", default="postgres")
         backup_container = Prompt.ask("Backup container name", default="db-backup")
+
+        # PostgreSQL credentials
+        postgres_user = Prompt.ask("PostgreSQL user", default="postgres")
+        postgres_password = Prompt.ask("PostgreSQL password", password=True)
 
         # Paths
         if mode == "remote":
@@ -153,6 +167,7 @@ class Config:
             "containers": {"postgres": postgres_container, "backup": backup_container},
             "paths": {"docker_compose": compose_path},
             "databases": databases,
+            "postgres": {"user": postgres_user, "password": postgres_password},
         }
 
         if mode == "remote":

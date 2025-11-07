@@ -6,6 +6,8 @@ def test_config_default_values():
     assert config.execution_mode == "remote"
     assert config.postgres_container == "postgres"
     assert config.backup_container == "db-backup"
+    assert config.postgres_user == "postgres"
+    assert config.postgres_password is None
 
 
 def test_config_local_mode():
@@ -15,6 +17,7 @@ def test_config_local_mode():
         "containers": {"postgres": "test-postgres", "backup": "test-backup"},
         "paths": {"docker_compose": "./test.yml"},
         "databases": ["testdb"],
+        "postgres": {"user": "testuser", "password": "testpass"},
     }
 
     assert config.execution_mode == "local"
@@ -22,6 +25,8 @@ def test_config_local_mode():
     assert config.backup_container == "test-backup"
     assert config.docker_compose_path == "./test.yml"
     assert config.databases == ["testdb"]
+    assert config.postgres_user == "testuser"
+    assert config.postgres_password == "testpass"
 
 
 def test_config_remote_mode():
@@ -37,6 +42,7 @@ def test_config_remote_mode():
         "containers": {"postgres": "postgres", "backup": "db-backup"},
         "paths": {"docker_compose": "/remote/compose.yml"},
         "databases": ["db1", "db2"],
+        "postgres": {"user": "pguser", "password": "pgpass"},
     }
 
     assert config.execution_mode == "remote"
@@ -44,6 +50,8 @@ def test_config_remote_mode():
     assert config.remote_user == "testuser"
     assert config.remote_port == 2222
     assert config.ssh_key_path == "/test/key"
+    assert config.postgres_user == "pguser"
+    assert config.postgres_password == "pgpass"
 
 
 def test_config_validation_local():
