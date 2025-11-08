@@ -69,39 +69,43 @@ class RemoteExecutor(BaseExecutor):
         command: str,
         show_command: bool = True,
         stdin: Optional[str] = None,
+        check: bool = True,
     ) -> Tuple[str, str, int]:
-        """Execute command on remote server, now with stdin support."""
-        if not self.client:
-            raise SSHError("Not connected to remote server")
-
+        """Execute command on remote host via SSH."""
         if show_command:
             console.print(f"[dim]$ {command}[/dim]")
 
         try:
-            # Get stdin, stdout, and stderr streams
-            stdin_pipe, stdout_pipe, stderr_pipe = self.client.exec_command(command)
+            stdin_channel, stdout, stderr = self.client.exec_command(command)
 
-            # NEW: Handle stdin
-            if stdin:
-                stdin_pipe.write(stdin)
-                stdin_pipe.channel.shutdown_write()  # Signal that we're done writing
-
-            exit_code = stdout_pipe.channel.recv_exit_status()
-            stdout_text = stdout_pipe.read().decode("utf-8").strip()
-            stderr_text = stderr_pipe.read().decode("utf-8").strip()
+            stdout_str = stdout.read().decode("utf-8").strip()
+            stderr_str = stderr.read().decode("utf-8").strip()
+            exit_code = stdout.channel.recv_exit_status()
 
             if exit_code != 0:
-                console.print(f"[red]Command failed with exit code {exit_code}[/red]")
-                if stderr_text:
-                    console.print(f"[red]Error: {stderr_text}[/red]")
+                error_msg = f"Command failed with exit code {exit_code}"
+                if stderr_str:
+                    error_msg += f"\nStderr: {stderr_str}"
+                if stdout_str:
+                    error_msg += f"\nStdout: {stdout_str}"
 
-            return stdout_text, stderr_text, exit_code
+                # Only raise if check=True
+                if check:
+                    console.print(f"[red]{error_msg}[/red]")
+                    raise SSHError(error_msg)
+
+            return stdout_str, stderr_str, exit_code
 
         except Exception as e:
+            if isinstance(e, SSHError):
+                raise
             raise SSHError(f"Failed to execute command: {e}")
 
     def file_exists(self, path: str) -> bool:
-        """Check if file exists on remote server."""
-        # The command exits with 0 if the file exists and is a regular file.
-        _, _, exit_code = self.execute(f"test -f {path}", show_command=False)
+        """Check if a file exists on the remote host."""
+        _, _, exit_code = self.execute(
+            f"test -f {path}",
+            show_command=False,
+            check=False,  # Don't raise exception on non-zero exit code
+        )
         return exit_code == 0

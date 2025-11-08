@@ -1,4 +1,3 @@
-import os
 import subprocess
 from typing import Optional, Tuple
 
@@ -58,5 +57,10 @@ class LocalExecutor(BaseExecutor):
             raise LocalError(f"Failed to execute command: {e}")
 
     def file_exists(self, path: str) -> bool:
-        """Check if a file exists on the local filesystem."""
-        return os.path.exists(path) and os.path.isfile(path)
+        """Check if a file exists locally."""
+        _, _, exit_code = self.execute(
+            f"test -f {path}",
+            show_command=False,
+            check=False,  # Don't raise exception on non-zero exit code
+        )
+        return exit_code == 0

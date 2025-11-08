@@ -73,33 +73,27 @@ class BaseExecutor(ABC):
         self,
         container: str,
         command: str,
-        user: Optional[str] = None,
         stdin: Optional[str] = None,
-        check: bool = True,  # Add this parameter
+        check: bool = True,
+        show_command: bool = True,
     ) -> Tuple[str, str, int]:
         """
-        Execute a command in a running Docker container.
+        Execute command inside a Docker container.
 
         Args:
-            container: The exact name or ID of the container.
-            command: The command to execute inside the container.
-            user: The user to run the command as.
-            stdin: Optional string data to be passed to the command's standard input.
-            check: If True, raise an exception on non-zero exit code.
+            container: Container name
+            command: Command to execute
+            stdin: Optional input to pass to command
+            check: Whether to raise exception on non-zero exit code
+            show_command: Whether to print the command being executed
 
         Returns:
-            A tuple of (stdout, stderr, exit_code).
+            Tuple of (stdout, stderr, exit_code)
         """
-        docker_command = "docker exec"
-        if stdin:
-            docker_command += " -i"  # Use interactive mode for stdin
-        if user:
-            docker_command += f" -u {user}"
-        docker_command += f" {container} {command}"
-
+        docker_cmd = f"docker exec {container} {command}"
         return self.execute(
-            docker_command, stdin=stdin, check=check
-        )  # Pass check parameter
+            docker_cmd, stdin=stdin, check=check, show_command=show_command
+        )
 
     def check_container_running(self, container: str) -> bool:
         """

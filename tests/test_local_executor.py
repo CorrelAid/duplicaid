@@ -1,7 +1,7 @@
 import pytest
 
 from duplicaid.config import Config
-from duplicaid.local import LocalExecutor
+from duplicaid.local import LocalError, LocalExecutor
 
 
 @pytest.fixture
@@ -25,11 +25,19 @@ def test_local_executor_basic_commands(local_config):
 
 
 def test_local_executor_failed_command(local_config):
+    """Test that LocalExecutor handles failed commands correctly."""
     executor = LocalExecutor(local_config)
 
     with executor:
-        stdout, stderr, exit_code = executor.execute("false", show_command=False)
+        # With check=False, should return non-zero exit code without raising
+        stdout, stderr, exit_code = executor.execute(
+            "false", show_command=False, check=False
+        )
         assert exit_code == 1
+
+        # With check=True (default), should raise LocalError
+        with pytest.raises(LocalError):
+            executor.execute("false", show_command=False, check=True)
 
 
 def test_local_executor_file_exists(local_config):
