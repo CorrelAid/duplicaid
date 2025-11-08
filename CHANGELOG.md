@@ -1,3 +1,10 @@
+## v2.0.0 (2025-11-08)
+
+### Feat
+
+- update log messages
+- yeet walg, rework executors and improve integration tests
+
 ## v1.2.0 (2025-11-07)
 
 ### Feat
