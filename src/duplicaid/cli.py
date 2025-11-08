@@ -24,13 +24,9 @@ app = typer.Typer(
 
 # Subcommands
 config_app = typer.Typer(name="config", help="Configuration management")
-backup_app = typer.Typer(name="backup", help="Create backups")
-restore_app = typer.Typer(name="restore", help="Restore from backups")
-list_app = typer.Typer(name="list", help="List available backups")
+list_app = typer.Typer(name="list", help="List available backups and databases")
 
 app.add_typer(config_app)
-app.add_typer(backup_app)
-app.add_typer(restore_app)
 app.add_typer(list_app)
 
 # Global configuration instance
@@ -127,9 +123,9 @@ def config_remove_db(
     config.remove_database(database)
 
 
-# Backup commands
-@backup_app.command()
-def create():
+# Backup command
+@app.command("backup")
+def backup():
     """Create a database backup."""
     check_config()
 
@@ -146,8 +142,8 @@ def create():
         raise typer.Exit(1)
 
 
-# Restore commands
-@restore_app.command()
+# Restore command
+@app.command("restore")
 def restore(
     database: str = typer.Argument(..., help="Database name to restore"),
     backup_file: str = typer.Argument(..., help="Backup filename"),
@@ -156,9 +152,7 @@ def restore(
     check_config()
 
     if database not in config.databases:
-        console.print(
-            f"[red]Database '{database}' not found in configuration :(.[/red]"
-        )
+        console.print(f"[red]Database '{database}' not found in configuration.[/red]")
         console.print("Available databases:", ", ".join(config.databases))
         raise typer.Exit(1)
 
@@ -181,8 +175,8 @@ def restore(
 
 
 # List commands
-@list_app.command()
-def backups():
+@list_app.command("backups")
+def list_backups():
     """List available backups."""
     check_config()
 
