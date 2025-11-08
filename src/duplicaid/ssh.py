@@ -67,7 +67,7 @@ class RemoteExecutor(BaseExecutor):
     def execute(
         self,
         command: str,
-        show_command: bool = True,
+        show_command: bool = False,
         stdin: Optional[str] = None,
         check: bool = True,
     ) -> Tuple[str, str, int]:
