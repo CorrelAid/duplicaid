@@ -290,11 +290,25 @@ class LogicalBackupManager:
             status.update(f"[bold blue]Restoring {database} from {backup_name}...")
 
             try:
+                host = self.config.postgres_host
+                port = self.config.postgres_port
+
+                if not host:
+                    host = self.config.postgres_container
+                if not port:
+                    port = "5432"
+
+                if not self.config.postgres_user or not self.config.postgres_password:
+                    console.print(
+                        "[red]Missing postgres user or password in configuration[/red]"
+                    )
+                    return False
+
                 restore_cmd = (
                     f"restore {backup_path} pgsql "
-                    f"{self.config.postgres_host} {database} "
+                    f"{host} {database} "
                     f"{self.config.postgres_user} {self.config.postgres_password} "
-                    f"{self.config.postgres_port}"
+                    f"{port}"
                 )
 
                 executor.docker_exec(
