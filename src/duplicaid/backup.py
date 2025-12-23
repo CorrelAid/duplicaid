@@ -230,7 +230,7 @@ class LogicalBackupManager:
             # Check if backup exists locally
             try:
                 _, _, exit_code = executor.docker_exec(
-                    "db-backup",
+                    self.config.backup_container,
                     f"test -f {backup_path}",
                     check=False,  # Don't raise on failure
                 )
@@ -297,7 +297,9 @@ class LogicalBackupManager:
                     f"{self.config.postgres_port}"
                 )
 
-                executor.docker_exec("db-backup", restore_cmd, check=True)
+                executor.docker_exec(
+                    self.config.backup_container, restore_cmd, check=True
+                )
                 console.print(
                     f"[green]✓ Logical restore completed for {database}[/green]"
                 )
