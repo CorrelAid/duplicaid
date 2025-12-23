@@ -1,3 +1,9 @@
+## v4.2.3 (2025-12-23)
+
+### Fix
+
+- validate postgres credentials and default host/port for restore (#10)
+
 ## v4.2.2 (2025-12-23)
 
 ### Fix
