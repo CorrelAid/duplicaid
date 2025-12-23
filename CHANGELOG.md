@@ -1,3 +1,9 @@
+## v4.2.0 (2025-12-23)
+
+### Feat
+
+- improve error message when ssh key is missing 2 (#5)
+
 ## v4.1.0 (2025-12-23)
 
 ### Feat
