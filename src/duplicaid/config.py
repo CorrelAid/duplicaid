@@ -258,7 +258,7 @@ class Config:
             if not self.remote_host or not self.ssh_key_path:
                 return False
             if not os.path.exists(self.ssh_key_path):
-                console.print(f"[red]SSH key not found: {self.ssh_key_path}[/red]")
+                console.print(f"[red]SSH key not found ): : {self.ssh_key_path}[/red]")
                 return False
             return True
 
