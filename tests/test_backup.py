@@ -43,7 +43,7 @@ def test_logical_backup_specific_database(test_config, mock_executor):
 def test_logical_backup_list(test_config, mock_executor):
     manager = LogicalBackupManager(test_config)
     mock_executor.docker_exec.return_value = (
-        "pgsql_postgres_testdb1_20241107-120000.sql.bz2\npgsql_postgres_testdb2_20241107-130000.sql.bz2",
+        "pgsql_testdb1_postgres_20241107-120000.sql.bz2\npgsql_testdb2_postgres_20241107-130000.sql.bz2",
         "",
         0,
     )
