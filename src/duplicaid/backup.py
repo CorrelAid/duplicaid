@@ -1,6 +1,7 @@
 """Backup operations for PostgreSQL logical dumps."""
 
 import re
+import shlex
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
@@ -14,6 +15,33 @@ from .executor import BaseExecutor
 from .ssh import RemoteExecutor, SSHError
 
 console = Console()
+
+
+def build_drop_recreate_cmd(host, port, user, password, database):
+    host_q = shlex.quote(host)
+    port_q = shlex.quote(str(port))
+    user_q = shlex.quote(user)
+    pwd_q = shlex.quote(password)
+
+    # escape double quotes inside identifier and single quotes inside SQL literal
+    db_ident = database.replace('"', '""')
+    db_literal = database.replace("'", "''")
+
+    terminate_sql = f"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{db_literal}' AND pid <> pg_backend_pid()"
+    drop_sql = f'DROP DATABASE IF EXISTS "{db_ident}"'
+    create_sql = f'CREATE DATABASE "{db_ident}"'
+
+    terminate_arg = shlex.quote(terminate_sql)
+    drop_arg = shlex.quote(drop_sql)
+    create_arg = shlex.quote(create_sql)
+
+    inner = (
+        f"PGPASSWORD={pwd_q} psql -h {host_q} -p {port_q} -U {user_q} -d postgres -v ON_ERROR_STOP=1 -c {terminate_arg}; "
+        f"PGPASSWORD={pwd_q} psql -h {host_q} -p {port_q} -U {user_q} -d postgres -v ON_ERROR_STOP=1 -c {drop_arg}; "
+        f"PGPASSWORD={pwd_q} psql -h {host_q} -p {port_q} -U {user_q} -d postgres -v ON_ERROR_STOP=1 -c {create_arg}"
+    )
+
+    return "bash -lc " + shlex.quote(inner)
 
 
 @dataclass
@@ -304,9 +332,12 @@ class LogicalBackupManager:
                     )
                     return False
 
-                drop_recreate_cmd = (
-                    f"psql -h {host} -p {port} -U {self.config.postgres_user} "
-                    f"-c 'DROP DATABASE IF EXISTS {database}; CREATE DATABASE {database};'"
+                drop_recreate_cmd = build_drop_recreate_cmd(
+                    host,
+                    port,
+                    self.config.postgres_user,
+                    self.config.postgres_password,
+                    database,
                 )
 
                 stdout, stderr, exit_code = executor.docker_exec(
