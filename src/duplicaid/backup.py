@@ -287,7 +287,7 @@ class LogicalBackupManager:
                     return False
 
             # Now restore the backup
-            status.update(f"[bold blue]Restoring {database} from {backup_name}...")
+            status.update(f"[bold blue]Dropping and recreating database {database}...")
 
             try:
                 host = self.config.postgres_host
@@ -304,6 +304,25 @@ class LogicalBackupManager:
                     )
                     return False
 
+                drop_recreate_cmd = (
+                    f"psql -h {host} -p {port} -U {self.config.postgres_user} "
+                    f"-c 'DROP DATABASE IF EXISTS {database}; CREATE DATABASE {database};'"
+                )
+
+                stdout, stderr, exit_code = executor.docker_exec(
+                    self.config.backup_container, drop_recreate_cmd, check=False
+                )
+
+                if exit_code != 0:
+                    console.print(
+                        f"[red]✗ Failed to drop/recreate database {database}[/red]"
+                    )
+                    if stderr:
+                        console.print(f"[red]Error: {stderr}[/red]")
+                    return False
+
+                status.update(f"[bold blue]Restoring {database} from {backup_name}...")
+
                 restore_cmd = (
                     f"restore {backup_path} pgsql "
                     f"{host} {database} "
@@ -311,9 +330,18 @@ class LogicalBackupManager:
                     f"{port}"
                 )
 
-                executor.docker_exec(
-                    self.config.backup_container, restore_cmd, check=True
+                stdout, stderr, exit_code = executor.docker_exec(
+                    self.config.backup_container, restore_cmd, check=False
                 )
+
+                if exit_code != 0 or "FATAL" in stderr or "ERROR" in stderr:
+                    console.print(f"[red]✗ Logical restore failed for {database}[/red]")
+                    if stderr:
+                        console.print(f"[red]Error: {stderr}[/red]")
+                    if stdout:
+                        console.print(f"[yellow]Output: {stdout}[/yellow]")
+                    return False
+
                 console.print(
                     f"[green]✓ Logical restore completed for {database}[/green]"
                 )
