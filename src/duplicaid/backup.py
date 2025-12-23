@@ -311,9 +311,18 @@ class LogicalBackupManager:
                     f"{port}"
                 )
 
-                executor.docker_exec(
-                    self.config.backup_container, restore_cmd, check=True
+                stdout, stderr, exit_code = executor.docker_exec(
+                    self.config.backup_container, restore_cmd, check=False
                 )
+
+                if exit_code != 0 or "FATAL" in stderr or "ERROR" in stderr:
+                    console.print(f"[red]✗ Logical restore failed for {database}[/red]")
+                    if stderr:
+                        console.print(f"[red]Error: {stderr}[/red]")
+                    if stdout:
+                        console.print(f"[yellow]Output: {stdout}[/yellow]")
+                    return False
+
                 console.print(
                     f"[green]✓ Logical restore completed for {database}[/green]"
                 )
