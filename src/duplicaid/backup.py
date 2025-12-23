@@ -287,7 +287,7 @@ class LogicalBackupManager:
                     return False
 
             # Now restore the backup
-            status.update(f"[bold blue]Restoring {database} from {backup_name}...")
+            status.update(f"[bold blue]Dropping and recreating database {database}...")
 
             try:
                 host = self.config.postgres_host
@@ -303,6 +303,25 @@ class LogicalBackupManager:
                         "[red]Missing postgres user or password in configuration[/red]"
                     )
                     return False
+
+                drop_recreate_cmd = (
+                    f"psql -h {host} -p {port} -U {self.config.postgres_user} "
+                    f"-c 'DROP DATABASE IF EXISTS {database}; CREATE DATABASE {database};'"
+                )
+
+                stdout, stderr, exit_code = executor.docker_exec(
+                    self.config.backup_container, drop_recreate_cmd, check=False
+                )
+
+                if exit_code != 0:
+                    console.print(
+                        f"[red]✗ Failed to drop/recreate database {database}[/red]"
+                    )
+                    if stderr:
+                        console.print(f"[red]Error: {stderr}[/red]")
+                    return False
+
+                status.update(f"[bold blue]Restoring {database} from {backup_name}...")
 
                 restore_cmd = (
                     f"restore {backup_path} pgsql "
