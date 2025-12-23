@@ -1,3 +1,9 @@
+## v4.2.1 (2025-12-23)
+
+### Fix
+
+- backup filename regex
+
 ## v4.2.0 (2025-12-23)
 
 ### Feat
