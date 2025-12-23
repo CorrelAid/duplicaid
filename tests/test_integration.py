@@ -97,7 +97,7 @@ def test_db_backup_container_integration(test_services, local_executor):
     print(latest_backup)
     print(backups)
     assert latest_backup.type == "logical"
-    assert latest_backup.database == "postgres"
+    assert latest_backup.database == "test"
 
 
 ## Restore
