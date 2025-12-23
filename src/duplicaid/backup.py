@@ -121,7 +121,8 @@ class LogicalBackupManager:
                 if any(ext in obj.object_name for ext in [".sql", ".bz2", ".gz"]):
                     filename = obj.object_name.split("/")[-1]
                     match = re.search(
-                        r"(?:pgsql|mysql|mongo)_\w+_(\w+)_(\d{8}[_-]\d{6})", filename
+                        r"(?:pgsql|mysql|mongo)_([\w-]+)_[\w-]+_(\d{8}[_-]\d{6})",
+                        filename,
                     )
                     if match:
                         database = match.group(1)
@@ -183,11 +184,11 @@ class LogicalBackupManager:
             if not line:
                 continue
 
-            # Parse db-backup filename format: pgsql_host_database_timestamp.sql.bz2
+            # Parse db-backup filename format: pgsql_database_host_timestamp.sql.bz2
             if ".sql" in line or ".bz2" in line:
                 try:
                     match = re.search(
-                        r"(?:pgsql|mysql|mongo)_\w+_(\w+)_(\d{8}[_-]\d{6})", line
+                        r"(?:pgsql|mysql|mongo)_([\w-]+)_[\w-]+_(\d{8}[_-]\d{6})", line
                     )
                     if match:
                         database = match.group(1)
