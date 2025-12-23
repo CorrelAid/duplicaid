@@ -255,11 +255,12 @@ class Config:
         if self.execution_mode == "local":
             return bool(self.postgres_container and self.docker_compose_path)
         else:
-            return bool(
-                self.remote_host
-                and self.ssh_key_path
-                and os.path.exists(self.ssh_key_path)
-            )
+            if not self.remote_host or not self.ssh_key_path:
+                return False
+            if not os.path.exists(self.ssh_key_path):
+                console.print(f"[red]SSH key not found: {self.ssh_key_path}[/red]")
+                return False
+            return True
 
     def validate(self) -> bool:
         """Validate configuration."""
