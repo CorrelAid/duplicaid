@@ -1,3 +1,9 @@
+## v4.2.2 (2025-12-23)
+
+### Fix
+
+- use configured backup container name in restore operations
+
 ## v4.2.1 (2025-12-23)
 
 ### Fix
